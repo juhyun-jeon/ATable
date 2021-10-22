@@ -9,13 +9,28 @@
           :class="getClass(idx)"
           :style="getStyle(idx)"
         >
-          <p>{{ item.label }}</p>
-          <p
-            class="a-table__column-item-sub"
-            v-if="detailMode && item.subLabel"
+          <label
+            @click.stop
+            v-if="item.field === 'code'"
+            class="a-table__select-checkbox"
           >
-            {{ item.subLabel }}
-          </p>
+            <input
+              class="a-table__select-input"
+              type="checkbox"
+              @change="selectAll"
+              :checked="checked.length === test.length"
+            />
+            <CheckBoxIcon :width="20" :height="20" />
+          </label>
+          <div v-else>
+            <p>{{ item.label }}</p>
+            <p
+              class="a-table__column-item-sub"
+              v-if="detailMode && item.subLabel"
+            >
+              {{ item.subLabel }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -34,10 +49,27 @@
           :class="getClass(idx)"
           :style="getStyle(idx)"
         >
-          <p>{{ row[item.field] }}</p>
-          <p v-if="detailMode && item.subLabel" class="a-table__row-item-sub">
-            {{ row[item.subField] }}
-          </p>
+          <label
+            @click.stop
+            v-if="item.field === 'code'"
+            class="a-table__select-checkbox"
+          >
+            <input
+              v-model="checked"
+              class="a-table__select-input"
+              type="checkbox"
+              :value="row.code"
+              @change="onChange"
+            />
+            <CheckBoxIcon :width="20" :height="20" />
+          </label>
+          <img v-else-if="item.field === 'image'" src="row[item.field]" />
+          <div v-else>
+            <p>{{ row[item.field] }}</p>
+            <p v-if="detailMode && item.subLabel" class="a-table__row-item-sub">
+              {{ row[item.subField] }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -45,7 +77,9 @@
 </template>
 
 <script>
+import CheckBoxIcon from "../icons/CheckBoxIcon.vue";
 export default {
+  components: { CheckBoxIcon },
   props: {
     columns: {
       type: Array,
@@ -64,6 +98,15 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      test: [],
+      checked: [],
+    };
+  },
+  created() {
+    this.test = this.rows.map((item) => item.code);
+  },
   methods: {
     getClass(idx) {
       return [this.columns[idx].thClass, this.columns[idx].align];
@@ -79,6 +122,13 @@ export default {
     onClickRow(i) {
       this.$emit("row-clicked", i);
     },
+    onChange() {
+      console.log(this.checked);
+    },
+    selectAll() {
+      if (this.checked.length === this.test.length) this.checked = [];
+      else this.checked = this.test;
+    },
   },
 };
 </script>
@@ -92,6 +142,7 @@ export default {
     padding: 0 10px;
     display: flex;
     align-items: center;
+    position: relative;
   }
   .a-table__row:hover {
     cursor: pointer;
@@ -113,6 +164,30 @@ export default {
       font-size: 1.3rem;
       line-height: 1.6rem;
       color: #646464;
+    }
+  }
+  .a-table__select-checkbox {
+    display: block;
+    .a-table__select-input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+      &:checked ~ {
+        .check-box-icon {
+          color: #dd2626;
+          .check-box-icon__background {
+            fill: #dd2626;
+          }
+        }
+      }
+    }
+    .check-box-icon {
+      position: absolute;
+      top: 0.8rem;
+      left: 1.8rem;
+      cursor: pointer;
     }
   }
 }
