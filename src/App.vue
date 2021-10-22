@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <button class="btn" @click="setDetailMode">Detail</button>
-    <button class="btn" @click="setDetailMode">Edit</button>
+    <button class="btn" @click="setSelectMode">Select</button>
     <div class="table-1">
       <a-table
         :columns="columns"
@@ -25,7 +25,7 @@ export default {
   data() {
     return {
       detailMode: false,
-      editMode: false,
+      selectMode: false,
       columns: [
         {
           label: "",
@@ -254,8 +254,23 @@ export default {
       if (this.detailMode) this.height = "5.2rem";
       else this.height = "3.6rem";
     },
-    setEditMode() {
-      this.editMode = !this.editMode;
+    setSelectMode() {
+      const checkbox = {
+        label: "",
+        field: "code",
+        thClass: "code-checkbox",
+        tdClass: "code-checkbox",
+        width: "50px",
+      };
+      const img = {
+        label: "",
+        field: "image",
+        width: "50px",
+      };
+      this.columns.splice(0, 1);
+      this.selectMode = !this.selectMode;
+      if (this.selectMode) this.columns.unshift(checkbox);
+      else this.columns.unshift(img);
     },
     changeStock(i) {
       console.log(i);
